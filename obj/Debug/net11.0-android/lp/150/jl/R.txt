@@ -1,0 +1,3 @@
+int attr swipeRefreshLayoutProgressSpinnerBackgroundColor 0x0
+int[] styleable SwipeRefreshLayout { 0x0 }
+int styleable SwipeRefreshLayout_swipeRefreshLayoutProgressSpinnerBackgroundColor 0

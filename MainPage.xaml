@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MinesweeperApp.ViewModels"
+             x:Class="MinesweeperApp.MainPage"
+             BackgroundColor="#1B5E20">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <vm:BoolToFlagTextConverter x:Key="BoolToFlagTextConverter"/>
+            <vm:BoolToColorConverter x:Key="BoolToColorConverter"/>
+            <vm:BoolToInstructionConverter x:Key="BoolToInstructionConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BindingContext>
+        <vm:GameViewModel/>
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout Padding="12"
+                         Spacing="10">
+
+        <!-- Start Screen -->
+        <VerticalStackLayout x:Name="StartScreen"
+                             VerticalOptions="Center"
+                             Spacing="20">
+
+            <Label Text="💣 MINESWEEPER 💣"
+                   TextColor="White"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"/>
+
+            <Label Text="Find all the mines without exploding!"
+                   TextColor="#A5D6A7"
+                   FontSize="16"
+                   HorizontalOptions="Center"/>
+
+            <Button Text="🎮 START GAME"
+                    Command="{Binding StartGameCommand}"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"
+                    CornerRadius="12"
+                    FontSize="18"
+                    HeightRequest="60"
+                    WidthRequest="200"
+                    HorizontalOptions="Center"/>
+
+            <Button Text="❌ QUIT"
+                    Command="{Binding QuitGameCommand}"
+                    BackgroundColor="#F44336"
+                    TextColor="White"
+                    CornerRadius="12"
+                    FontSize="18"
+                    HeightRequest="60"
+                    WidthRequest="200"
+                    HorizontalOptions="Center"/>
+
+        </VerticalStackLayout>
+
+        <!-- Game Screen -->
+        <VerticalStackLayout x:Name="GameScreen"
+                             Spacing="10">
+
+            <!-- Header -->
+            <Border BackgroundColor="#2E7D32"
+                    StrokeShape="RoundRectangle 12"
+                    StrokeThickness="0"
+                    Padding="12">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                    <HorizontalStackLayout Grid.Column="0"
+                                           Spacing="6"
+                                           VerticalOptions="Center">
+                        <Label Text="💣"
+                               FontSize="20"/>
+                        <Label Text="{Binding MinesLeft}"
+                               FontSize="20"
+                               TextColor="White"
+                               FontAttributes="Bold"/>
+                    </HorizontalStackLayout>
+                    <Label Grid.Column="1"
+                           Text="{Binding StatusMessage}"
+                           FontSize="13"
+                           TextColor="White"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                    <Button Grid.Column="2"
+                            Text="{Binding IsFlagMode, Converter={StaticResource BoolToFlagTextConverter}}"
+                            Command="{Binding ToggleFlagModeCommand}"
+                            BackgroundColor="{Binding IsFlagMode, Converter={StaticResource BoolToColorConverter}}"
+                            TextColor="White"
+                            CornerRadius="8"
+                            FontSize="14"
+                            HeightRequest="40"
+                            WidthRequest="60"
+                            Margin="0,0,5,0"/>
+                    <Button Grid.Column="3"
+                            Text="🔄"
+                            Command="{Binding RestartCommand}"
+                            BackgroundColor="#FF8F00"
+                            TextColor="White"
+                            CornerRadius="8"
+                            FontSize="16"
+                            HeightRequest="40"
+                            WidthRequest="50"/>
+                </Grid>
+            </Border>
+
+            <!-- Game Board -->
+            <CollectionView ItemsSource="{Binding Cells}"
+                            HorizontalOptions="Center">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical"
+                                     Span="9"
+                                     HorizontalItemSpacing="3"
+                                     VerticalItemSpacing="3"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BackgroundColor="{Binding BackgroundColor}"
+                                StrokeShape="RoundRectangle 6"
+                                StrokeThickness="1"
+                                Stroke="#4CAF50"
+                                Padding="0"
+                                HeightRequest="38"
+                                WidthRequest="38">
+                            <Label Text="{Binding DisplayText}"
+                                   TextColor="{Binding TextColor}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   FontSize="15"
+                                   FontAttributes="Bold"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RevealCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="{Binding IsFlagMode, Converter={StaticResource BoolToInstructionConverter}}"
+                   TextColor="#A5D6A7"
+                   HorizontalOptions="Center"
+                   FontSize="12"/>
+
+        </VerticalStackLayout>
+
+    </VerticalStackLayout>
+</ContentPage>
