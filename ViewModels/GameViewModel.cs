@@ -3,6 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using MinesweeperApp.Models;
 using System.Globalization;
+using System.Threading.Tasks;
+using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
 
 namespace MinesweeperApp.ViewModels
@@ -26,7 +28,6 @@ namespace MinesweeperApp.ViewModels
         private IDispatcherTimer? _gameTimer;
         private string _bestTimeEasy = "--:--";
         private string _bestTimeMedium = "--:--";
-        private string _bestTimeHard = "--:--";
 
         public List<GameCell> Cells { get; private set; } = new();
 
@@ -88,13 +89,16 @@ namespace MinesweeperApp.ViewModels
             set { _bestTimeMedium = value; OnPropertyChanged(); }
         }
 
-        public string BestTimeHard
-        {
-            get => _bestTimeHard;
-            set { _bestTimeHard = value; OnPropertyChanged(); }
-        }
-
         public int MinesLeft => _mineCount - _flagsPlaced;
+
+        public int GridColumns => _cols > 0 ? _cols : 9;
+
+        public int CellSize => _cols switch
+        {
+            <= 9 => 42,
+            <= 16 => 34,
+            _ => 26
+        };
 
         public ICommand RevealCommand { get; }
         public ICommand FlagCommand { get; }
@@ -109,11 +113,11 @@ namespace MinesweeperApp.ViewModels
         {
             RevealCommand = new Command<GameCell>(RevealCell);
             FlagCommand = new Command<GameCell>(FlagCell);
-            RestartCommand = new Command(RestartCurrentGame);
+            RestartCommand = new Command(async () => await RestartCurrentGameAsync());
             ToggleFlagModeCommand = new Command(ToggleFlagMode);
-            StartGameCommand = new Command(StartGame);
+            StartGameCommand = new Command(async () => await StartGameAsync());
             QuitGameCommand = new Command(QuitGame);
-            SelectDifficultyCommand = new Command<DifficultyLevel>(SelectDifficulty);
+            SelectDifficultyCommand = new Command<DifficultyLevel>(async difficulty => await SelectDifficultyAsync(difficulty));
             BackToDifficultyCommand = new Command(BackToDifficulty);
 
             LoadBestTimes();
@@ -123,7 +127,6 @@ namespace MinesweeperApp.ViewModels
         {
             BestTimeEasy = FormatStoredTime(Preferences.Default.Get("best_time_easy", -1));
             BestTimeMedium = FormatStoredTime(Preferences.Default.Get("best_time_medium", -1));
-            BestTimeHard = FormatStoredTime(Preferences.Default.Get("best_time_hard", -1));
         }
 
         private string FormatStoredTime(int seconds)
@@ -140,7 +143,6 @@ namespace MinesweeperApp.ViewModels
             {
                 DifficultyLevel.Easy => "best_time_easy",
                 DifficultyLevel.Medium => "best_time_medium",
-                DifficultyLevel.Hard => "best_time_hard",
                 _ => "best_time_easy"
             };
 
@@ -152,10 +154,10 @@ namespace MinesweeperApp.ViewModels
             }
         }
 
-        private void SelectDifficulty(DifficultyLevel difficulty)
+        private async Task SelectDifficultyAsync(DifficultyLevel difficulty)
         {
             SelectedDifficulty = difficulty;
-            StartGame();
+            await StartGameAsync();
         }
 
         private void BackToDifficulty()
@@ -166,48 +168,93 @@ namespace MinesweeperApp.ViewModels
             StatusMessage = "Select Difficulty 🎯";
         }
 
-        public void InitGame()
+        private async Task StartGameAsync()
         {
-            _currentSettings = GameSettings.GetSettings(SelectedDifficulty);
-            _rows = _currentSettings.Rows;
-            _cols = _currentSettings.Cols;
-            _mineCount = _currentSettings.MineCount;
+            StatusMessage = "Preparing board...";
+            IsGameStarted = true;
+            IsDifficultySelectionVisible = false;
+            await InitGameAsync();
+        }
 
-            _gameOver = false;
-            _gameWon = false;
-            _flagsPlaced = 0;
-            IsFlagMode = false;
-            ElapsedSeconds = 0;
-            StatusMessage = "Good luck! 🎯";
-            _grid = new GameCell[_rows, _cols];
+        private async Task RestartCurrentGameAsync()
+        {
+            StatusMessage = "Restarting...";
+            await InitGameAsync();
+        }
 
-            for (int r = 0; r < _rows; r++)
-                for (int c = 0; c < _cols; c++)
-                    _grid[r, c] = new GameCell { Row = r, Column = c };
+        private async Task InitGameAsync()
+        {
+            var settings = GameSettings.GetSettings(SelectedDifficulty);
+            int rows = settings.Rows;
+            int cols = settings.Cols;
+            int mineCount = settings.MineCount;
 
-            var rng = new Random();
-            int placed = 0;
-            while (placed < _mineCount)
+            // Run heavy computations off main thread
+            var gameData = await Task.Run(() =>
             {
-                int r = rng.Next(_rows);
-                int c = rng.Next(_cols);
-                if (!_grid[r, c].IsMine)
+                var grid = new GameCell[rows, cols];
+                for (int r = 0; r < rows; r++)
+                    for (int c = 0; c < cols; c++)
+                        grid[r, c] = new GameCell { Row = r, Column = c };
+
+                // Fisher-Yates shuffle for mine placement (more efficient)
+                var positions = Enumerable.Range(0, rows * cols).OrderBy(x => Guid.NewGuid()).Take(mineCount).ToList();
+                foreach (var pos in positions)
                 {
-                    _grid[r, c].IsMine = true;
-                    placed++;
+                    int r = pos / cols;
+                    int c = pos % cols;
+                    grid[r, c].IsMine = true;
                 }
-            }
 
-            for (int r = 0; r < _rows; r++)
-                for (int c = 0; c < _cols; c++)
-                    if (!_grid[r, c].IsMine)
-                        _grid[r, c].AdjacentMines = CountAdjacentMines(r, c);
+                // Calculate adjacent mines
+                for (int r = 0; r < rows; r++)
+                    for (int c = 0; c < cols; c++)
+                        if (!grid[r, c].IsMine)
+                            grid[r, c].AdjacentMines = CountAdjacentMines(grid, rows, cols, r, c);
 
-            Cells = _grid.Cast<GameCell>().ToList();
-            OnPropertyChanged(nameof(Cells));
-            OnPropertyChanged(nameof(MinesLeft));
+                return grid.Cast<GameCell>().ToList();
+            });
 
-            StartGameTimer();
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                _currentSettings = settings;
+                _rows = rows;
+                _cols = cols;
+                _mineCount = mineCount;
+
+                // Reconstruct grid from flat list
+                _grid = new GameCell[rows, cols];
+                for (int i = 0; i < gameData.Count; i++)
+                {
+                    int r = i / cols;
+                    int c = i % cols;
+                    _grid[r, c] = gameData[i];
+                }
+
+                _gameOver = false;
+                _gameWon = false;
+                _flagsPlaced = 0;
+                IsFlagMode = false;
+                ElapsedSeconds = 0;
+                StatusMessage = "Good luck! 🎯";
+
+                Cells = gameData;
+                OnPropertyChanged(nameof(Cells));
+                OnPropertyChanged(nameof(MinesLeft));
+                OnPropertyChanged(nameof(GridColumns));
+                OnPropertyChanged(nameof(CellSize));
+
+                StartGameTimer();
+            });
+        }
+
+        private int CountAdjacentMines(GameCell[,] grid, int rows, int cols, int r, int c)
+        {
+            return Neighbors().Count(n =>
+            {
+                int nr = r + n.dr, nc = c + n.dc;
+                return nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr, nc].IsMine;
+            });
         }
 
         private void StartGameTimer()
@@ -241,18 +288,6 @@ namespace MinesweeperApp.ViewModels
             IsFlagMode = !IsFlagMode;
         }
 
-        private void StartGame()
-        {
-            IsGameStarted = true;
-            IsDifficultySelectionVisible = false;
-            InitGame();
-        }
-
-        private void RestartCurrentGame()
-        {
-            InitGame();
-        }
-
         private void QuitGame()
         {
             Application.Current?.Quit();
@@ -281,7 +316,6 @@ namespace MinesweeperApp.ViewModels
             }
 
             FloodReveal(cell.Row, cell.Column);
-            OnPropertyChanged(nameof(Cells));
 
             if (CheckWin())
             {
@@ -297,40 +331,72 @@ namespace MinesweeperApp.ViewModels
             if (_gameOver || _gameWon || cell.IsRevealed) return;
             cell.IsFlagged = !cell.IsFlagged;
             _flagsPlaced += cell.IsFlagged ? 1 : -1;
-            OnPropertyChanged(nameof(Cells));
             OnPropertyChanged(nameof(MinesLeft));
         }
 
-        private void FloodReveal(int r, int c)
+        private int FloodReveal(int r, int c)
         {
-            if (_grid == null || r < 0 || r >= _rows || c < 0 || c >= _cols) return;
-            var cell = _grid[r, c];
-            if (cell.IsRevealed || cell.IsFlagged || cell.IsMine) return;
-            cell.IsRevealed = true;
-            if (cell.AdjacentMines == 0)
+            if (_grid == null || r < 0 || r >= _rows || c < 0 || c >= _cols) return 0;
+
+            var queue = new Queue<(int r, int c)>();
+            var revealed = new HashSet<(int, int)>();
+            queue.Enqueue((r, c));
+            revealed.Add((r, c));
+
+            int revealCount = 0;
+
+            while (queue.Count > 0)
+            {
+                var (cr, cc) = queue.Dequeue();
+                var cell = _grid[cr, cc];
+                if (cell.IsRevealed || cell.IsFlagged || cell.IsMine) continue;
+
+                cell.IsRevealed = true;
+                revealCount++;
+
+                if (cell.AdjacentMines != 0) continue;
+
                 foreach (var (dr, dc) in Neighbors())
-                    FloodReveal(r + dr, c + dc);
+                {
+                    int nr = cr + dr;
+                    int nc = cc + dc;
+                    if (nr < 0 || nr >= _rows || nc < 0 || nc >= _cols) continue;
+                    if (revealed.Contains((nr, nc))) continue;
+                    var neighbor = _grid[nr, nc];
+                    if (!neighbor.IsRevealed && !neighbor.IsFlagged && !neighbor.IsMine)
+                    {
+                        queue.Enqueue((nr, nc));
+                        revealed.Add((nr, nc));
+                    }
+                }
+            }
+
+            // Notify UI about all changes at once
+            if (revealCount > 0)
+            {
+                OnPropertyChanged(nameof(Cells));
+            }
+
+            return revealCount;
         }
 
         private void RevealAllMines()
         {
+            int count = 0;
             foreach (var cell in Cells.Where(c => c.IsMine))
-                cell.IsRevealed = true;
-            OnPropertyChanged(nameof(Cells));
+            {
+                if (!cell.IsRevealed)
+                {
+                    cell.IsRevealed = true;
+                    count++;
+                }
+            }
+            if (count > 0)
+                OnPropertyChanged(nameof(Cells));
         }
 
         private bool CheckWin() =>
             Cells.Where(c => !c.IsMine).All(c => c.IsRevealed);
-
-        private int CountAdjacentMines(int r, int c)
-        {
-            if (_grid == null) return 0;
-            return Neighbors().Count(n =>
-            {
-                int nr = r + n.dr, nc = c + n.dc;
-                return nr >= 0 && nr < _rows && nc >= 0 && nc < _cols && _grid[nr, nc].IsMine;
-            });
-        }
 
         private static IEnumerable<(int dr, int dc)> Neighbors() =>
             new[] { (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1) };

@@ -6,14 +6,6 @@
              x:Class="MinesweeperApp.MainPage"
              BackgroundColor="#0F0F23">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <vm:BoolToFlagTextConverter x:Key="BoolToFlagTextConverter"/>
-            <vm:BoolToColorConverter x:Key="BoolToColorConverter"/>
-            <vm:BoolToInstructionConverter x:Key="BoolToInstructionConverter"/>
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
     <ContentPage.BindingContext>
         <vm:GameViewModel/>
     </ContentPage.BindingContext>
@@ -126,36 +118,7 @@
                         </Grid>
                     </Border>
 
-                    <!-- Hard Button -->
-                    <Border BackgroundColor="#D32F2F"
-                            StrokeShape="RoundRectangle 24"
-                            StrokeThickness="0"
-                            Padding="0"
-                            HeightRequest="100">
-                        <Grid Padding="20"
-                              ColumnDefinitions="Auto,*,Auto"
-                              ColumnSpacing="12">
-                            <VerticalStackLayout Grid.Column="0"
-                                                 VerticalOptions="Center"
-                                                 Spacing="4">
-                                <Label Text="HARD"
-                                       TextColor="#FFFFFF"
-                                       FontSize="18"
-                                       FontAttributes="Bold"/>
-                                <Label Text="30x16, 99 mines"
-                                       TextColor="#FFCDD2"
-                                       FontSize="12"/>
-                            </VerticalStackLayout>
-                            <Label Grid.Column="2"
-                                   Text="⭐⭐⭐"
-                                   FontSize="36"
-                                   VerticalOptions="Center"/>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectDifficultyCommand}"
-                                                      CommandParameter="{x:Static m:DifficultyLevel.Hard}"/>
-                            </Border.GestureRecognizers>
-                        </Grid>
-                    </Border>
+
 
                     <!-- Best Times -->
                     <VerticalStackLayout Spacing="8"
@@ -165,7 +128,7 @@
                                FontSize="16"
                                FontAttributes="Bold"
                                HorizontalOptions="Center"/>
-                        <Grid ColumnDefinitions="*,*,*"
+                        <Grid ColumnDefinitions="*,*"
                               ColumnSpacing="8">
                             <Border Grid.Column="0"
                                     BackgroundColor="#1a1a32"
@@ -205,25 +168,6 @@
                                            HorizontalOptions="Center"/>
                                 </VerticalStackLayout>
                             </Border>
-                            <Border Grid.Column="2"
-                                    BackgroundColor="#1a1a32"
-                                    StrokeShape="RoundRectangle 16"
-                                    StrokeThickness="1"
-                                    Stroke="#3a3a5a"
-                                    Padding="12">
-                                <VerticalStackLayout Spacing="4"
-                                                     HorizontalOptions="Center">
-                                    <Label Text="Hard"
-                                           TextColor="#B0B0D0"
-                                           FontSize="12"
-                                           HorizontalOptions="Center"/>
-                                    <Label Text="{Binding BestTimeHard}"
-                                           TextColor="#D32F2F"
-                                           FontSize="14"
-                                           FontAttributes="Bold"
-                                           HorizontalOptions="Center"/>
-                                </VerticalStackLayout>
-                            </Border>
                         </Grid>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
@@ -246,57 +190,59 @@
             <!-- Game Screen -->
             <VerticalStackLayout x:Name="GameScreen"
                                  IsVisible="{Binding IsGameStarted}"
-                                 Spacing="12">
+                                 Spacing="8"
+                                 Padding="8,12,8,8"
+                                 VerticalOptions="FillAndExpand">
 
                 <!-- Header with Timer and Mines -->
                 <Border BackgroundColor="#1a1a32"
-                        StrokeShape="RoundRectangle 20"
+                        StrokeShape="RoundRectangle 16"
                         StrokeThickness="1"
                         Stroke="#3a3a5a"
-                        Padding="16">
-                    <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto"
-                          ColumnSpacing="12">
+                        Padding="12,10,12,10">
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto"
+                          ColumnSpacing="10">
+                        <!-- Status Message -->
+                        <Label Grid.Column="0"
+                               Text="{Binding StatusMessage}"
+                               FontSize="13"
+                               TextColor="#FFFFFF"
+                               HorizontalOptions="Start"
+                               VerticalOptions="Center"
+                               FontAttributes="Bold"/>
+
                         <!-- Mines Counter -->
-                        <Border Grid.Column="0"
+                        <Border Grid.Column="1"
                                 BackgroundColor="#D32F2F"
-                                StrokeShape="RoundRectangle 12"
+                                StrokeShape="RoundRectangle 10"
                                 StrokeThickness="0"
-                                Padding="12">
-                            <HorizontalStackLayout Spacing="6"
+                                Padding="10,6,10,6">
+                            <HorizontalStackLayout Spacing="4"
                                                    VerticalOptions="Center">
                                 <Label Text="💣"
-                                       FontSize="18"
+                                       FontSize="14"
                                        VerticalOptions="Center"/>
                                 <Label Text="{Binding MinesLeft}"
-                                       FontSize="16"
+                                       FontSize="12"
                                        TextColor="White"
                                        FontAttributes="Bold"
                                        VerticalOptions="Center"/>
                             </HorizontalStackLayout>
                         </Border>
 
-                        <!-- Status Message -->
-                        <Label Grid.Column="1"
-                               Text="{Binding StatusMessage}"
-                               FontSize="14"
-                               TextColor="#FFFFFF"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               FontAttributes="Bold"/>
-
                         <!-- Timer -->
                         <Border Grid.Column="2"
                                 BackgroundColor="#1E88E5"
-                                StrokeShape="RoundRectangle 12"
+                                StrokeShape="RoundRectangle 10"
                                 StrokeThickness="0"
-                                Padding="12">
-                            <HorizontalStackLayout Spacing="6"
+                                Padding="10,6,10,6">
+                            <HorizontalStackLayout Spacing="4"
                                                    VerticalOptions="Center">
                                 <Label Text="⏱️"
-                                       FontSize="18"
+                                       FontSize="14"
                                        VerticalOptions="Center"/>
                                 <Label Text="{Binding FormattedTime}"
-                                       FontSize="16"
+                                       FontSize="12"
                                        TextColor="White"
                                        FontAttributes="Bold"
                                        VerticalOptions="Center"/>
@@ -309,11 +255,12 @@
                                 Command="{Binding ToggleFlagModeCommand}"
                                 BackgroundColor="{Binding IsFlagMode, Converter={StaticResource BoolToColorConverter}}"
                                 TextColor="White"
-                                CornerRadius="12"
-                                FontSize="16"
+                                CornerRadius="10"
+                                FontSize="14"
                                 FontAttributes="Bold"
-                                HeightRequest="44"
-                                WidthRequest="50"/>
+                                HeightRequest="36"
+                                WidthRequest="40"
+                                Padding="0"/>
 
                         <!-- Restart Button -->
                         <Button Grid.Column="4"
@@ -321,67 +268,92 @@
                                 Command="{Binding RestartCommand}"
                                 BackgroundColor="#FF8F00"
                                 TextColor="White"
-                                CornerRadius="12"
-                                FontSize="16"
-                                HeightRequest="44"
-                                WidthRequest="50"/>
+                                CornerRadius="10"
+                                FontSize="14"
+                                HeightRequest="36"
+                                WidthRequest="40"
+                                Padding="0"/>
                     </Grid>
                 </Border>
 
-                <!-- Scroll View for Game Board -->
-                <ScrollView Padding="0">
-                    <CollectionView ItemsSource="{Binding Cells}"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center">
-                        <CollectionView.ItemsLayout>
-                            <GridItemsLayout Orientation="Vertical"
-                                             Span="9"
-                                             HorizontalItemSpacing="4"
-                                             VerticalItemSpacing="4"/>
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Border BackgroundColor="{Binding BackgroundColor}"
-                                        StrokeShape="RoundRectangle 10"
-                                        StrokeThickness="2"
-                                        Stroke="#2a2a4a"
-                                        Padding="0"
-                                        HeightRequest="38"
-                                        WidthRequest="38">
-                                    <Label Text="{Binding DisplayText}"
-                                           TextColor="{Binding TextColor}"
-                                           HorizontalOptions="Center"
-                                           VerticalOptions="Center"
-                                           FontSize="15"
-                                           FontAttributes="Bold"/>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RevealCommand}"
-                                            CommandParameter="{Binding .}"/>
-                                    </Border.GestureRecognizers>
-                                </Border>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </ScrollView>
+                <!-- Game Board Container -->
+                <Border BackgroundColor="#1a1a32"
+                        StrokeShape="RoundRectangle 16"
+                        StrokeThickness="1"
+                        Stroke="#3a3a5a"
+                        Padding="8"
+                        VerticalOptions="FillAndExpand"
+                        HorizontalOptions="Center">
+                    <Grid RowDefinitions="*"
+                          ColumnDefinitions="*"
+                          Padding="0">
+                        <CollectionView Grid.Row="0"
+                                        ItemsSource="{Binding Cells}"
+                                        SelectionMode="None"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center">
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout Orientation="Vertical"
+                                                 Span="{Binding GridColumns}"
+                                                 HorizontalItemSpacing="3"
+                                                 VerticalItemSpacing="3"/>
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BackgroundColor="{Binding BackgroundColor}"
+                                            StrokeShape="RoundRectangle 8"
+                                            StrokeThickness="1.5"
+                                            Stroke="#2a2a4a"
+                                            Padding="0"
+                                            HeightRequest="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CellSize}"
+                                            WidthRequest="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CellSize}">
+                                        <Label Text="{Binding DisplayText}"
+                                               TextColor="{Binding TextColor}"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               FontSize="13"
+                                               FontAttributes="Bold"/>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RevealCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                        </Border.GestureRecognizers>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Grid>
+                </Border>
 
                 <!-- Instructions -->
                 <Label Text="{Binding IsFlagMode, Converter={StaticResource BoolToInstructionConverter}}"
-                       TextColor="#B0B0D0"
+                       TextColor="#A0A0C0"
                        HorizontalOptions="Center"
-                       FontSize="12"
-                       Margin="0,8,0,0"/>
+                       FontSize="11"
+                       Margin="0,4,0,4"/>
 
-                <!-- Back Button -->
-                <Button Text="← Back to Menu"
-                        Command="{Binding BackToDifficultyCommand}"
-                        BackgroundColor="#424242"
-                        TextColor="White"
-                        CornerRadius="20"
-                        FontSize="14"
-                        FontAttributes="Bold"
-                        HeightRequest="48"
-                        Margin="0,12,0,0"/>
+                <!-- Footer Buttons -->
+                <HorizontalStackLayout Spacing="8"
+                                       HorizontalOptions="Center"
+                                       Margin="0,8,0,0">
+                    <!-- Back Button -->
+                    <Border BackgroundColor="#2C3E50"
+                            StrokeShape="RoundRectangle 16"
+                            StrokeThickness="1"
+                            Stroke="#3a3a5a"
+                            Padding="0"
+                            WidthRequest="180"
+                            HeightRequest="44">
+                        <Button Text="← Back to Menu"
+                                Command="{Binding BackToDifficultyCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="#FFFFFF"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
+                    </Border>
+                </HorizontalStackLayout>
 
             </VerticalStackLayout>
 

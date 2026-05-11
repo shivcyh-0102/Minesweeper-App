@@ -3,8 +3,7 @@ namespace MinesweeperApp.Models
     public enum DifficultyLevel
     {
         Easy,
-        Medium,
-        Hard
+        Medium
     }
 
     public class GameSettings
@@ -29,13 +28,6 @@ namespace MinesweeperApp.Models
                 Rows = 16,
                 Cols = 16,
                 MineCount = 40
-            },
-            DifficultyLevel.Hard => new GameSettings
-            {
-                Difficulty = DifficultyLevel.Hard,
-                Rows = 16,
-                Cols = 30,
-                MineCount = 99
             },
             _ => throw new ArgumentException("Unknown difficulty level")
         };
