@@ -1,4 +1,4 @@
-# 💣 Minesweeper App
+# Minesweeper App 💣
 
 A classic Minesweeper game built with **.NET MAUI** targeting **Android** devices.
 
