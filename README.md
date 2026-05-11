@@ -3,7 +3,7 @@
 A classic Minesweeper game built with **.NET MAUI** targeting **Android** devices.
 
 ![Platform](https://img.shields.io/badge/Platform-Android-green)
-![Framework](https://img.shields.io/badge/Framework-.NET%20MAUI-pink)
+![Framework](https://img.shields.io/badge/Framework-.NET%20MAUI-purple)
 ![Language](https://img.shields.io/badge/Language-C%23-blue)
 ![Version](https://img.shields.io/badge/Version-1.0.0-orange)
 
