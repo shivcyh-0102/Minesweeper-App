@@ -13,10 +13,25 @@ namespace MinesweeperApp.Models
         private bool _displayTextCached;
         private bool _backgroundColorCached;
         private bool _textColorCached;
+        private string _theme = "Classic";
 
         public int Row { get; set; }
         public int Column { get; set; }
         public bool IsMine { get; set; }
+
+        public string Theme
+        {
+            get => _theme;
+            set
+            {
+                if (_theme == value) return;
+                _theme = value;
+                _backgroundColorCached = false;
+                _textColorCached = false;
+                OnPropertyChanged(nameof(BackgroundColor));
+                OnPropertyChanged(nameof(TextColor));
+            }
+        }
 
         public bool IsRevealed
         {
@@ -67,9 +82,13 @@ namespace MinesweeperApp.Models
             get
             {
                 if (_backgroundColorCached) return _backgroundColorCache;
-                var color = !IsRevealed ? Color.FromArgb("#4CAF50") :
-                    IsMine ? Color.FromArgb("#FF4444") :
-                    Color.FromArgb("#E8F5E9");
+                var color = Theme switch
+                {
+                    "Light" => !IsRevealed ? Color.FromArgb("#2E7D32") : IsMine ? Color.FromArgb("#D32F2F") : Color.FromArgb("#F7FBF7"),
+                    "Retro" => !IsRevealed ? Color.FromArgb("#5C6B2F") : IsMine ? Color.FromArgb("#B71C1C") : Color.FromArgb("#D7C58A"),
+                    "Neon" => !IsRevealed ? Color.FromArgb("#00A878") : IsMine ? Color.FromArgb("#FF2E63") : Color.FromArgb("#E9FFF8"),
+                    _ => !IsRevealed ? Color.FromArgb("#4CAF50") : IsMine ? Color.FromArgb("#FF4444") : Color.FromArgb("#E8F5E9")
+                };
                 _backgroundColorCache = color;
                 _backgroundColorCached = true;
                 return color;

@@ -1,362 +1,430 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:MinesweeperApp.ViewModels"
              xmlns:m="clr-namespace:MinesweeperApp.Models"
              x:Class="MinesweeperApp.MainPage"
-             BackgroundColor="#0F0F23">
+             BackgroundColor="{Binding PageBackground}">
 
     <ContentPage.BindingContext>
         <vm:GameViewModel/>
     </ContentPage.BindingContext>
 
-    <Grid RowDefinitions="*"
-          ColumnDefinitions="*">
-        <!-- Main Content -->
-        <VerticalStackLayout Grid.Row="0"
-                             Grid.Column="0"
-                             Padding="16"
-                             Spacing="16">
-
-            <!-- Start/Difficulty Selection Screen -->
-            <VerticalStackLayout x:Name="StartScreen"
-                                 IsVisible="{Binding IsGameStarted, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=inverse}"
-                                 VerticalOptions="Center"
-                                 Spacing="24">
-
-                <!-- Title -->
-                <VerticalStackLayout Spacing="8"
-                                     HorizontalOptions="Center">
-                    <Label Text="💣"
-                           FontSize="64"
-                           HorizontalOptions="Center"
-                           Margin="0,0,0,8"/>
-                    <Label Text="MINESWEEPER"
-                           TextColor="#FFFFFF"
-                           FontSize="42"
-                           FontAttributes="Bold"
-                           HorizontalOptions="Center"
-                           HorizontalTextAlignment="Center"/>
-                    <Label Text="Find all the mines without exploding!"
-                           TextColor="#B0B0D0"
-                           FontSize="15"
-                           HorizontalOptions="Center"
-                           HorizontalTextAlignment="Center"/>
-                </VerticalStackLayout>
-
-                <!-- Difficulty Selection -->
-                <VerticalStackLayout x:Name="DifficultyScreen"
-                                     IsVisible="{Binding IsDifficultySelectionVisible}"
-                                     Spacing="16">
-
-                    <Label Text="Select Difficulty"
-                           TextColor="#FFFFFF"
-                           FontSize="24"
-                           FontAttributes="Bold"
-                           HorizontalOptions="Center"
-                           Margin="0,16,0,0"/>
-
-                    <!-- Easy Button -->
-                    <Border BackgroundColor="#1E88E5"
-                            StrokeShape="RoundRectangle 24"
-                            StrokeThickness="0"
-                            Padding="0"
-                            HeightRequest="100">
-                        <Grid Padding="20"
-                              ColumnDefinitions="Auto,*,Auto"
-                              ColumnSpacing="12">
-                            <VerticalStackLayout Grid.Column="0"
-                                                 VerticalOptions="Center"
-                                                 Spacing="4">
-                                <Label Text="EASY"
-                                       TextColor="#FFFFFF"
-                                       FontSize="18"
-                                       FontAttributes="Bold"/>
-                                <Label Text="9x9, 10 mines"
-                                       TextColor="#B3E5FC"
-                                       FontSize="12"/>
-                            </VerticalStackLayout>
-                            <Label Grid.Column="2"
-                                   Text="⭐"
-                                   FontSize="36"
-                                   VerticalOptions="Center"/>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectDifficultyCommand}"
-                                                      CommandParameter="{x:Static m:DifficultyLevel.Easy}"/>
-                            </Border.GestureRecognizers>
-                        </Grid>
-                    </Border>
-
-                    <!-- Medium Button -->
-                    <Border BackgroundColor="#F57C00"
-                            StrokeShape="RoundRectangle 24"
-                            StrokeThickness="0"
-                            Padding="0"
-                            HeightRequest="100">
-                        <Grid Padding="20"
-                              ColumnDefinitions="Auto,*,Auto"
-                              ColumnSpacing="12">
-                            <VerticalStackLayout Grid.Column="0"
-                                                 VerticalOptions="Center"
-                                                 Spacing="4">
-                                <Label Text="MEDIUM"
-                                       TextColor="#FFFFFF"
-                                       FontSize="18"
-                                       FontAttributes="Bold"/>
-                                <Label Text="16x16, 40 mines"
-                                       TextColor="#FFE0B2"
-                                       FontSize="12"/>
-                            </VerticalStackLayout>
-                            <Label Grid.Column="2"
-                                   Text="⭐⭐"
-                                   FontSize="36"
-                                   VerticalOptions="Center"/>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectDifficultyCommand}"
-                                                      CommandParameter="{x:Static m:DifficultyLevel.Medium}"/>
-                            </Border.GestureRecognizers>
-                        </Grid>
-                    </Border>
-
-
-
-                    <!-- Best Times -->
-                    <VerticalStackLayout Spacing="8"
-                                         Margin="0,20,0,0">
-                        <Label Text="🏆 Best Times"
-                               TextColor="#FFFFFF"
-                               FontSize="16"
+    <Grid>
+        <ScrollView IsVisible="{Binding IsGameStarted, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=inverse}">
+            <VerticalStackLayout Padding="18,18,18,28"
+                                 Spacing="14">
+                <Border BackgroundColor="{Binding SurfaceColor}"
+                        Stroke="{Binding PanelStroke}"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="18">
+                    <Grid RowDefinitions="Auto,Auto"
+                          ColumnDefinitions="*,Auto"
+                          RowSpacing="6">
+                        <Label Text="MINESWEEPER"
+                               TextColor="{Binding HeaderText}"
+                               FontSize="36"
                                FontAttributes="Bold"
-                               HorizontalOptions="Center"/>
-                        <Grid ColumnDefinitions="*,*"
+                               LineBreakMode="NoWrap"/>
+                        <Border Grid.Column="1"
+                                BackgroundColor="{Binding PanelColor}"
+                                Stroke="{Binding PanelStroke}"
+                                StrokeShape="RoundRectangle 8"
+                                Padding="10,6"
+                                VerticalOptions="Start">
+                            <Label Text="{Binding ThemeName}"
+                                   TextColor="{Binding PrimaryAccent}"
+                                   FontAttributes="Bold"
+                                   FontSize="12"/>
+                        </Border>
+                        <Label Grid.Row="1"
+                               Grid.ColumnSpan="2"
+                               Text="Modern mines, clean logic, fair first move."
+                               TextColor="{Binding MutedText}"
+                               FontSize="14"/>
+                    </Grid>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*"
+                      RowDefinitions="Auto,Auto"
+                      ColumnSpacing="10"
+                      RowSpacing="10">
+                    <Button Text="Easy&#10;9x9 • 10"
+                            Command="{Binding SelectDifficultyCommand}"
+                            CommandParameter="{x:Static m:DifficultyLevel.Easy}"
+                            BackgroundColor="{Binding PrimaryAccent}"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="78"
+                            FontAttributes="Bold"/>
+                    <Button Grid.Column="1"
+                            Text="Medium&#10;16x16 • 40"
+                            Command="{Binding SelectDifficultyCommand}"
+                            CommandParameter="{x:Static m:DifficultyLevel.Medium}"
+                            BackgroundColor="#F28C28"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="78"
+                            FontAttributes="Bold"/>
+                    <Button Grid.Row="1"
+                            Text="Hard&#10;16x30 • 99"
+                            Command="{Binding SelectDifficultyCommand}"
+                            CommandParameter="{x:Static m:DifficultyLevel.Hard}"
+                            BackgroundColor="{Binding DangerAccent}"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="78"
+                            FontAttributes="Bold"/>
+                    <Button Grid.Row="1"
+                            Grid.Column="1"
+                            Text="{Binding CustomSummary, StringFormat='Custom&#10;{0}'}"
+                            Command="{Binding SelectDifficultyCommand}"
+                            CommandParameter="{x:Static m:DifficultyLevel.Custom}"
+                            BackgroundColor="#7652D6"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="78"
+                            FontAttributes="Bold"/>
+                </Grid>
+
+                <Border BackgroundColor="{Binding PanelColor}"
+                        Stroke="{Binding PanelStroke}"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="14">
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Custom Board"
+                                   TextColor="{Binding HeaderText}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"/>
+                            <Label Grid.Column="1"
+                                   Text="{Binding CustomSummary}"
+                                   TextColor="{Binding MutedText}"
+                                   FontSize="12"
+                                   VerticalOptions="Center"/>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,*,*"
                               ColumnSpacing="8">
-                            <Border Grid.Column="0"
-                                    BackgroundColor="#1a1a32"
-                                    StrokeShape="RoundRectangle 16"
-                                    StrokeThickness="1"
-                                    Stroke="#3a3a5a"
-                                    Padding="12">
-                                <VerticalStackLayout Spacing="4"
-                                                     HorizontalOptions="Center">
-                                    <Label Text="Easy"
-                                           TextColor="#B0B0D0"
-                                           FontSize="12"
-                                           HorizontalOptions="Center"/>
-                                    <Label Text="{Binding BestTimeEasy}"
-                                           TextColor="#1E88E5"
-                                           FontSize="14"
-                                           FontAttributes="Bold"
-                                           HorizontalOptions="Center"/>
-                                </VerticalStackLayout>
+                            <Border BackgroundColor="{Binding SurfaceColor}"
+                                    Stroke="{Binding PanelStroke}"
+                                    StrokeShape="RoundRectangle 8"
+                                    Padding="8,2">
+                                <Entry Text="{Binding CustomRows}"
+                                       Keyboard="Numeric"
+                                       Placeholder="Rows"
+                                       TextColor="{Binding HeaderText}"
+                                       PlaceholderColor="{Binding MutedText}"/>
                             </Border>
                             <Border Grid.Column="1"
-                                    BackgroundColor="#1a1a32"
-                                    StrokeShape="RoundRectangle 16"
-                                    StrokeThickness="1"
-                                    Stroke="#3a3a5a"
-                                    Padding="12">
-                                <VerticalStackLayout Spacing="4"
-                                                     HorizontalOptions="Center">
-                                    <Label Text="Medium"
-                                           TextColor="#B0B0D0"
-                                           FontSize="12"
-                                           HorizontalOptions="Center"/>
-                                    <Label Text="{Binding BestTimeMedium}"
-                                           TextColor="#F57C00"
-                                           FontSize="14"
-                                           FontAttributes="Bold"
-                                           HorizontalOptions="Center"/>
-                                </VerticalStackLayout>
+                                    BackgroundColor="{Binding SurfaceColor}"
+                                    Stroke="{Binding PanelStroke}"
+                                    StrokeShape="RoundRectangle 8"
+                                    Padding="8,2">
+                                <Entry Text="{Binding CustomCols}"
+                                       Keyboard="Numeric"
+                                       Placeholder="Cols"
+                                       TextColor="{Binding HeaderText}"
+                                       PlaceholderColor="{Binding MutedText}"/>
+                            </Border>
+                            <Border Grid.Column="2"
+                                    BackgroundColor="{Binding SurfaceColor}"
+                                    Stroke="{Binding PanelStroke}"
+                                    StrokeShape="RoundRectangle 8"
+                                    Padding="8,2">
+                                <Entry Text="{Binding CustomMines}"
+                                       Keyboard="Numeric"
+                                       Placeholder="Mines"
+                                       TextColor="{Binding HeaderText}"
+                                       PlaceholderColor="{Binding MutedText}"/>
                             </Border>
                         </Grid>
                     </VerticalStackLayout>
-                </VerticalStackLayout>
-
-                <!-- Quit Button -->
-                <Button Text="❌ QUIT"
-                        Command="{Binding QuitGameCommand}"
-                        BackgroundColor="#424242"
-                        TextColor="White"
-                        CornerRadius="24"
-                        FontSize="16"
-                        FontAttributes="Bold"
-                        HeightRequest="54"
-                        WidthRequest="200"
-                        HorizontalOptions="Center"
-                        Margin="0,16,0,0"/>
-
-            </VerticalStackLayout>
-
-            <!-- Game Screen -->
-            <VerticalStackLayout x:Name="GameScreen"
-                                 IsVisible="{Binding IsGameStarted}"
-                                 Spacing="8"
-                                 Padding="8,12,8,8"
-                                 VerticalOptions="FillAndExpand">
-
-                <!-- Header with Timer and Mines -->
-                <Border BackgroundColor="#1a1a32"
-                        StrokeShape="RoundRectangle 16"
-                        StrokeThickness="1"
-                        Stroke="#3a3a5a"
-                        Padding="12,10,12,10">
-                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto"
-                          ColumnSpacing="10">
-                        <!-- Status Message -->
-                        <Label Grid.Column="0"
-                               Text="{Binding StatusMessage}"
-                               FontSize="13"
-                               TextColor="#FFFFFF"
-                               HorizontalOptions="Start"
-                               VerticalOptions="Center"
-                               FontAttributes="Bold"/>
-
-                        <!-- Mines Counter -->
-                        <Border Grid.Column="1"
-                                BackgroundColor="#D32F2F"
-                                StrokeShape="RoundRectangle 10"
-                                StrokeThickness="0"
-                                Padding="10,6,10,6">
-                            <HorizontalStackLayout Spacing="4"
-                                                   VerticalOptions="Center">
-                                <Label Text="💣"
-                                       FontSize="14"
-                                       VerticalOptions="Center"/>
-                                <Label Text="{Binding MinesLeft}"
-                                       FontSize="12"
-                                       TextColor="White"
-                                       FontAttributes="Bold"
-                                       VerticalOptions="Center"/>
-                            </HorizontalStackLayout>
-                        </Border>
-
-                        <!-- Timer -->
-                        <Border Grid.Column="2"
-                                BackgroundColor="#1E88E5"
-                                StrokeShape="RoundRectangle 10"
-                                StrokeThickness="0"
-                                Padding="10,6,10,6">
-                            <HorizontalStackLayout Spacing="4"
-                                                   VerticalOptions="Center">
-                                <Label Text="⏱️"
-                                       FontSize="14"
-                                       VerticalOptions="Center"/>
-                                <Label Text="{Binding FormattedTime}"
-                                       FontSize="12"
-                                       TextColor="White"
-                                       FontAttributes="Bold"
-                                       VerticalOptions="Center"/>
-                            </HorizontalStackLayout>
-                        </Border>
-
-                        <!-- Flag Mode Button -->
-                        <Button Grid.Column="3"
-                                Text="{Binding IsFlagMode, Converter={StaticResource BoolToFlagTextConverter}}"
-                                Command="{Binding ToggleFlagModeCommand}"
-                                BackgroundColor="{Binding IsFlagMode, Converter={StaticResource BoolToColorConverter}}"
-                                TextColor="White"
-                                CornerRadius="10"
-                                FontSize="14"
-                                FontAttributes="Bold"
-                                HeightRequest="36"
-                                WidthRequest="40"
-                                Padding="0"/>
-
-                        <!-- Restart Button -->
-                        <Button Grid.Column="4"
-                                Text="🔄"
-                                Command="{Binding RestartCommand}"
-                                BackgroundColor="#FF8F00"
-                                TextColor="White"
-                                CornerRadius="10"
-                                FontSize="14"
-                                HeightRequest="36"
-                                WidthRequest="40"
-                                Padding="0"/>
-                    </Grid>
                 </Border>
 
-                <!-- Game Board Container -->
-                <Border BackgroundColor="#1a1a32"
-                        StrokeShape="RoundRectangle 16"
-                        StrokeThickness="1"
-                        Stroke="#3a3a5a"
-                        Padding="8"
-                        VerticalOptions="FillAndExpand"
-                        HorizontalOptions="Center">
-                    <Grid RowDefinitions="*"
-                          ColumnDefinitions="*"
-                          Padding="0">
-                        <CollectionView Grid.Row="0"
-                                        ItemsSource="{Binding Cells}"
+                <Border BackgroundColor="{Binding PanelColor}"
+                        Stroke="{Binding PanelStroke}"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="14">
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Appearance"
+                                   TextColor="{Binding HeaderText}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"/>
+                            <HorizontalStackLayout Grid.Column="1"
+                                                   Spacing="8">
+                                <Label Text="Feedback"
+                                       TextColor="{Binding MutedText}"
+                                       FontSize="12"
+                                       VerticalOptions="Center"/>
+                                <Switch IsToggled="{Binding IsFeedbackEnabled}"
+                                        VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,*,*,*"
+                              ColumnSpacing="8">
+                            <Button Text="Classic" Command="{Binding SelectThemeCommand}" CommandParameter="Classic" BackgroundColor="#3949AB" TextColor="White" CornerRadius="8" HeightRequest="42"/>
+                            <Button Grid.Column="1" Text="Light" Command="{Binding SelectThemeCommand}" CommandParameter="Light" BackgroundColor="#607D8B" TextColor="White" CornerRadius="8" HeightRequest="42"/>
+                            <Button Grid.Column="2" Text="Retro" Command="{Binding SelectThemeCommand}" CommandParameter="Retro" BackgroundColor="#8D6E63" TextColor="White" CornerRadius="8" HeightRequest="42"/>
+                            <Button Grid.Column="3" Text="Neon" Command="{Binding SelectThemeCommand}" CommandParameter="Neon" BackgroundColor="#00838F" TextColor="White" CornerRadius="8" HeightRequest="42"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*"
+                      ColumnSpacing="10">
+                    <Border BackgroundColor="{Binding PanelColor}"
+                            Stroke="{Binding PanelStroke}"
+                            StrokeShape="RoundRectangle 8"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Record"
+                                   TextColor="{Binding MutedText}"
+                                   FontSize="12"/>
+                            <Grid ColumnDefinitions="*,*"
+                                  RowDefinitions="Auto,Auto,Auto,Auto"
+                                  RowSpacing="5">
+                                <Label Text="Easy" TextColor="{Binding MutedText}" FontSize="12"/>
+                                <Label Grid.Column="1" Text="{Binding BestTimeEasy}" TextColor="{Binding HeaderText}" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                                <Label Grid.Row="1" Text="Medium" TextColor="{Binding MutedText}" FontSize="12"/>
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding BestTimeMedium}" TextColor="{Binding HeaderText}" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                                <Label Grid.Row="2" Text="Hard" TextColor="{Binding MutedText}" FontSize="12"/>
+                                <Label Grid.Row="2" Grid.Column="1" Text="{Binding BestTimeHard}" TextColor="{Binding HeaderText}" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                                <Label Grid.Row="3" Text="Custom" TextColor="{Binding MutedText}" FontSize="12"/>
+                                <Label Grid.Row="3" Grid.Column="1" Text="{Binding BestTimeCustom}" TextColor="{Binding HeaderText}" FontAttributes="Bold" HorizontalTextAlignment="End"/>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1"
+                            BackgroundColor="{Binding PanelColor}"
+                            Stroke="{Binding PanelStroke}"
+                            StrokeShape="RoundRectangle 8"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Stats"
+                                   TextColor="{Binding MutedText}"
+                                   FontSize="12"/>
+                            <Label Text="{Binding WinRateText}"
+                                   TextColor="{Binding HeaderText}"
+                                   FontSize="28"
+                                   FontAttributes="Bold"/>
+                            <Label Text="{Binding GamesPlayed, StringFormat='{0} games played'}"
+                                   TextColor="{Binding MutedText}"
+                                   FontSize="12"/>
+                            <Label Text="{Binding BestStreak, StringFormat='Best streak: {0}'}"
+                                   TextColor="{Binding PrimaryAccent}"
+                                   FontSize="12"
+                                   FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid IsVisible="{Binding IsGameStarted}"
+              RowDefinitions="Auto,Auto,*"
+              Padding="12"
+              RowSpacing="10">
+            <Border BackgroundColor="{Binding PanelColor}"
+                    Stroke="{Binding PanelStroke}"
+                    StrokeShape="RoundRectangle 8"
+                    Padding="12">
+                <Grid ColumnDefinitions="*,Auto,Auto"
+                      RowDefinitions="Auto,Auto"
+                      ColumnSpacing="8"
+                      RowSpacing="8">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="{Binding DifficultyLabel}"
+                               TextColor="{Binding HeaderText}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               LineBreakMode="TailTruncation"/>
+                        <Label Text="{Binding StatusMessage}"
+                               TextColor="{Binding MutedText}"
+                               FontSize="12"
+                               LineBreakMode="TailTruncation"/>
+                    </VerticalStackLayout>
+                    <Border Grid.Column="1"
+                            BackgroundColor="{Binding SurfaceColor}"
+                            Stroke="{Binding PanelStroke}"
+                            StrokeShape="RoundRectangle 8"
+                            Padding="10,6">
+                        <Label Text="{Binding MinesLeft, StringFormat='{0} mines'}"
+                               TextColor="{Binding HeaderText}"
+                               FontSize="12"
+                               FontAttributes="Bold"/>
+                    </Border>
+                    <Border Grid.Column="2"
+                            BackgroundColor="{Binding PrimaryAccent}"
+                            StrokeShape="RoundRectangle 8"
+                            Padding="10,6">
+                        <Label Text="{Binding FormattedTime}"
+                               TextColor="White"
+                               FontSize="12"
+                               FontAttributes="Bold"/>
+                    </Border>
+                    <ProgressBar Grid.Row="1"
+                                 Grid.ColumnSpan="3"
+                                 Progress="{Binding Progress}"
+                                 ProgressColor="{Binding SuccessAccent}"
+                                 BackgroundColor="{Binding SurfaceColor}"
+                                 HeightRequest="6"/>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="Auto,Auto,Auto,*,Auto"
+                  ColumnSpacing="8">
+                <Button Text="-"
+                        Command="{Binding ZoomOutCommand}"
+                        BackgroundColor="{Binding PanelColor}"
+                        TextColor="{Binding HeaderText}"
+                        BorderColor="{Binding PanelStroke}"
+                        BorderWidth="1"
+                        CornerRadius="8"
+                        WidthRequest="44"
+                        HeightRequest="40"/>
+                <Button Grid.Column="1"
+                        Text="+"
+                        Command="{Binding ZoomInCommand}"
+                        BackgroundColor="{Binding PanelColor}"
+                        TextColor="{Binding HeaderText}"
+                        BorderColor="{Binding PanelStroke}"
+                        BorderWidth="1"
+                        CornerRadius="8"
+                        WidthRequest="44"
+                        HeightRequest="40"/>
+                <Button Grid.Column="2"
+                        Text="{Binding IsFlagMode, Converter={StaticResource BoolToFlagTextConverter}}"
+                        Command="{Binding ToggleFlagModeCommand}"
+                        BackgroundColor="{Binding IsFlagMode, Converter={StaticResource BoolToColorConverter}}"
+                        TextColor="White"
+                        CornerRadius="8"
+                        WidthRequest="64"
+                        HeightRequest="40"/>
+                <Label Grid.Column="3"
+                       Text="{Binding ProgressText}"
+                       TextColor="{Binding MutedText}"
+                       VerticalOptions="Center"
+                       FontSize="12"/>
+                <Button Grid.Column="4"
+                        Text="New"
+                        Command="{Binding RestartCommand}"
+                        BackgroundColor="#FF8F00"
+                        TextColor="White"
+                        CornerRadius="8"
+                        WidthRequest="64"
+                        HeightRequest="40"/>
+            </Grid>
+
+            <Border Grid.Row="2"
+                    BackgroundColor="{Binding SurfaceColor}"
+                    Stroke="{Binding PanelStroke}"
+                    StrokeShape="RoundRectangle 8"
+                    Padding="8">
+                <Grid RowDefinitions="*,Auto"
+                      RowSpacing="8">
+                    <ScrollView Orientation="Both"
+                                HorizontalScrollBarVisibility="Always"
+                                VerticalScrollBarVisibility="Always">
+                        <CollectionView ItemsSource="{Binding Cells}"
                                         SelectionMode="None"
-                                        HorizontalOptions="Center"
-                                        VerticalOptions="Center">
+                                        ItemSizingStrategy="MeasureFirstItem"
+                                        WidthRequest="{Binding BoardWidth}"
+                                        HeightRequest="{Binding BoardHeight}">
                             <CollectionView.ItemsLayout>
                                 <GridItemsLayout Orientation="Vertical"
                                                  Span="{Binding GridColumns}"
-                                                 HorizontalItemSpacing="3"
-                                                 VerticalItemSpacing="3"/>
+                                                 HorizontalItemSpacing="{Binding BoardSpacing}"
+                                                 VerticalItemSpacing="{Binding BoardSpacing}"/>
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <Border BackgroundColor="{Binding BackgroundColor}"
-                                            StrokeShape="RoundRectangle 8"
-                                            StrokeThickness="1.5"
-                                            Stroke="#2a2a4a"
-                                            Padding="0"
+                                    <Button Text="{Binding DisplayText}"
+                                            TextColor="{Binding TextColor}"
+                                            BackgroundColor="{Binding BackgroundColor}"
+                                            BorderColor="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PanelStroke}"
+                                            BorderWidth="1"
+                                            CornerRadius="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CellCornerRadius}"
                                             HeightRequest="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CellSize}"
-                                            WidthRequest="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CellSize}">
-                                        <Label Text="{Binding DisplayText}"
-                                               TextColor="{Binding TextColor}"
-                                               HorizontalOptions="Center"
-                                               VerticalOptions="Center"
-                                               FontSize="13"
-                                               FontAttributes="Bold"/>
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RevealCommand}"
-                                                CommandParameter="{Binding .}"/>
-                                        </Border.GestureRecognizers>
-                                    </Border>
+                                            WidthRequest="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CellSize}"
+                                            FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CellFontSize}"
+                                            FontAttributes="Bold"
+                                            Padding="0"
+                                            Pressed="CellButton_Pressed"
+                                            Released="CellButton_Released"/>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
-                    </Grid>
-                </Border>
-
-                <!-- Instructions -->
-                <Label Text="{Binding IsFlagMode, Converter={StaticResource BoolToInstructionConverter}}"
-                       TextColor="#A0A0C0"
-                       HorizontalOptions="Center"
-                       FontSize="11"
-                       Margin="0,4,0,4"/>
-
-                <!-- Footer Buttons -->
-                <HorizontalStackLayout Spacing="8"
-                                       HorizontalOptions="Center"
-                                       Margin="0,8,0,0">
-                    <!-- Back Button -->
-                    <Border BackgroundColor="#2C3E50"
-                            StrokeShape="RoundRectangle 16"
-                            StrokeThickness="1"
-                            Stroke="#3a3a5a"
-                            Padding="0"
-                            WidthRequest="180"
-                            HeightRequest="44">
-                        <Button Text="← Back to Menu"
+                    </ScrollView>
+                    <Grid Grid.Row="1"
+                          ColumnDefinitions="*,Auto"
+                          ColumnSpacing="10">
+                        <Label Text="{Binding IsFlagMode, Converter={StaticResource BoolToInstructionConverter}}"
+                               TextColor="{Binding MutedText}"
+                               FontSize="12"
+                               VerticalOptions="Center"/>
+                        <Button Grid.Column="1"
+                                Text="Menu"
                                 Command="{Binding BackToDifficultyCommand}"
-                                BackgroundColor="Transparent"
-                                TextColor="#FFFFFF"
-                                FontSize="14"
-                                FontAttributes="Bold"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"/>
-                    </Border>
-                </HorizontalStackLayout>
+                                BackgroundColor="{Binding PanelColor}"
+                                TextColor="{Binding HeaderText}"
+                                BorderColor="{Binding PanelStroke}"
+                                BorderWidth="1"
+                                CornerRadius="8"
+                                HeightRequest="40"
+                                WidthRequest="84"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
 
-            </VerticalStackLayout>
-
-        </VerticalStackLayout>
+        <Grid IsVisible="{Binding ShowResultDialog}"
+              BackgroundColor="#99000000"
+              Padding="22">
+            <Border BackgroundColor="{Binding PanelColor}"
+                    Stroke="{Binding ResultAccentColor}"
+                    StrokeThickness="2"
+                    StrokeShape="RoundRectangle 8"
+                    Padding="18"
+                    VerticalOptions="Center">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="{Binding ResultTitle}"
+                           TextColor="{Binding HeaderText}"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"/>
+                    <Label Text="{Binding ResultSummary}"
+                           TextColor="{Binding MutedText}"
+                           FontSize="15"
+                           HorizontalTextAlignment="Center"/>
+                    <Label Text="{Binding ResultDetail}"
+                           TextColor="{Binding PrimaryAccent}"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"/>
+                    <Grid ColumnDefinitions="*,*"
+                          ColumnSpacing="10"
+                          Margin="0,8,0,0">
+                        <Button Text="Play Again"
+                                Command="{Binding PlayAgainCommand}"
+                                BackgroundColor="{Binding PrimaryAccent}"
+                                TextColor="White"
+                                CornerRadius="8"
+                                HeightRequest="46"/>
+                        <Button Grid.Column="1"
+                                Text="Close"
+                                Command="{Binding DismissResultCommand}"
+                                BackgroundColor="{Binding PanelColor}"
+                                BorderColor="{Binding PanelStroke}"
+                                BorderWidth="1"
+                                TextColor="{Binding HeaderText}"
+                                CornerRadius="8"
+                                HeightRequest="46"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </Grid>
 </ContentPage>
