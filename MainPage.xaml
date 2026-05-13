@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:MinesweeperApp.ViewModels"
              xmlns:m="clr-namespace:MinesweeperApp.Models"
+             xmlns:controls="clr-namespace:MinesweeperApp.Controls"
              x:Class="MinesweeperApp.MainPage"
              BackgroundColor="{Binding PageBackground}">
 
@@ -325,41 +326,16 @@
                     Padding="8">
                 <Grid RowDefinitions="*,Auto"
                       RowSpacing="8">
-                    <ScrollView Orientation="Both"
-                                HorizontalScrollBarVisibility="Always"
-                                VerticalScrollBarVisibility="Always">
-                        <CollectionView ItemsSource="{Binding Cells}"
-                                        SelectionMode="None"
-                                        ItemSizingStrategy="MeasureFirstItem"
-                                        WidthRequest="{Binding BoardWidth}"
-                                        HeightRequest="{Binding BoardHeight}">
-                            <CollectionView.ItemsLayout>
-                                <GridItemsLayout Orientation="Vertical"
-                                                 Span="{Binding GridColumns}"
-                                                 HorizontalItemSpacing="{Binding BoardSpacing}"
-                                                 VerticalItemSpacing="{Binding BoardSpacing}"/>
-                            </CollectionView.ItemsLayout>
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <Button Text="{Binding DisplayText}"
-                                            TextColor="{Binding TextColor}"
-                                            BackgroundColor="{Binding BackgroundColor}"
-                                            BorderColor="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PanelStroke}"
-                                            BorderWidth="1"
-                                            CornerRadius="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CellCornerRadius}"
-                                            HeightRequest="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CellSize}"
-                                            WidthRequest="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CellSize}"
-                                            FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CellFontSize}"
-                                            FontAttributes="Bold"
-                                            Padding="0"
-                                            Loaded="CellButton_Loaded"
-                                            Unloaded="CellButton_Unloaded"
-                                            Pressed="CellButton_Pressed"
-                                            Released="CellButton_Released"/>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </ScrollView>
+                    <controls:MinesweeperBoardView Cells="{Binding Cells}"
+                                                    CellSize="{Binding CellSize}"
+                                                    CellFontSize="{Binding CellFontSize}"
+                                                    BoardSpacing="{Binding BoardSpacing}"
+                                                    CellCornerRadius="{Binding CellCornerRadius}"
+                                                    BoardWidth="{Binding BoardWidth}"
+                                                    BoardHeight="{Binding BoardHeight}"
+                                                    PanelStroke="{Binding PanelStroke}"
+                                                    RevealCommand="{Binding RevealCommand}"
+                                                    FlagCommand="{Binding FlagCommand}"/>
                     <Grid Grid.Row="1"
                           ColumnDefinitions="*,Auto"
                           ColumnSpacing="10">
