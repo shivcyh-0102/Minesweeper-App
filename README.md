@@ -21,7 +21,7 @@ A clean, fully-featured Minesweeper clone built with **.NET MAUI** for Android �
 | Action | Gesture |
 |---|---|
 | Reveal a cell | Tap |
-| Place / remove flag 🚩 | Double-tap |
+| Place / remove flag 🚩 | Hold |
 | Restart the game | Tap the 🔄 button |
 
 Revealed cells show a number indicating how many of the 8 surrounding cells contain mines. Cells with no adjacent mines are automatically revealed in a flood fill. Flag all mines and reveal all safe cells to win.
