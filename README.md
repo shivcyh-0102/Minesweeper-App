@@ -16,7 +16,7 @@ A clean, fully-featured Minesweeper clone built with **.NET MAUI** — tap to re
 
 ---
 
-## 🎮 How to Play
+## How to Play
 
 | Action | Gesture |
 |---|---|
@@ -31,7 +31,7 @@ Revealed cells show a number indicating how many of the 8 surrounding cells cont
 
 ---
 
-## ✨ Features
+##  Features
 
 - **Difficulty presets** — Easy (9×9, 10 mines), Medium (16×16, 40 mines), Hard (16×30, 99 mines)
 - **Custom mode** — configure rows (6–24), columns (6–30), and mine count freely
@@ -49,7 +49,7 @@ Revealed cells show a number indicating how many of the 8 surrounding cells cont
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 The project follows **MVVM** (Model-View-ViewModel) to keep game logic cleanly separated from the UI.
 
@@ -71,7 +71,7 @@ MinesweeperApp/
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -85,7 +85,7 @@ MinesweeperApp/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -147,7 +147,7 @@ DifficultyLevel.Custom => 6–24 rows, 6–30 cols, configurable mines
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 - [ ] Animated mine reveal on loss
 - [ ] Sound effects (platform audio implementation)
@@ -156,6 +156,6 @@ DifficultyLevel.Custom => 6–24 rows, 6–30 cols, configurable mines
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
