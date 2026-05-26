@@ -40,7 +40,7 @@ namespace MinesweeperApp
 			}
 			catch
 			{
-				// Result animation is decorative; never block the dialog.
+				
 			}
 		}
 	}
